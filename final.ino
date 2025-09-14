@@ -1,4 +1,4 @@
-  #define BLYNK_TEMPLATE_ID "TMPL3kXN9dvfC"
+#define BLYNK_TEMPLATE_ID "TMPL3kXN9dvfC"
 #define BLYNK_TEMPLATE_NAME "oso"
 
 #include <WiFi.h>
@@ -8,21 +8,21 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-// 🔹 Blynk Authentication Token
+// Blynk Authentication Token
 char auth[] = "DQ9vl8CJ4zXs3xn-wWaLUPxzOtu5GHQO";
 
-// 🔹 WiFi Credentials
+// WiFi Credentials
 char ssid[] = "Ishaan's jio phone";
 char pass[] = "12345678";
 
-// 🔹 OLED Display Setup
+// OLED Display Setup
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define SDA_PIN 21
 #define SCL_PIN 22
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-// 🔹 Define GPIO Pins
+// GPIO Pins
 const int inductiveSensorPin = 33;  // Inductive sensor
 const int irSensorPin = 32;         // IR sensor
 const int raindropSensorPin = 34;   // Raindrop sensor (ADC)
@@ -32,7 +32,7 @@ const int binServoPin = 26;         // Servo motor for rotating bin
 Servo lidServo;
 Servo binServo;
 
-// 🔹 Blynk Virtual Pins Assignments
+// Blynk Virtual Pins Assignments
 #define V0_SERVO V0
 #define V1_IR_SENSOR V1
 #define V2_INDUCTIVE_SENSOR V2
@@ -41,15 +41,10 @@ Servo binServo;
 #define V5_WET_LED V5
 #define V6_DRY_LED V6
 
-//// 🔹 Define Bin Rotation Angles (hexagonal bin with 3 compartments)
-//#define METAL_BIN_POS 0   // Position for Metal Waste
-//#define WET_BIN_POS 120   // Position for Wet Waste
-//#define DRY_BIN_POS 240   // Position for Dry Waste
-
 void setup() {
   Serial.begin(115200);
 
-  // 🔹 Connect to WiFi
+  // Connect to WiFi
   WiFi.begin(ssid, pass);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
@@ -57,10 +52,10 @@ void setup() {
   }
   Serial.println("Connected to WiFi!");
 
-  // 🔹 Connect to Blynk
+  // Connect to Blynk
   Blynk.begin(auth, ssid, pass);
 
-  // 🔹 Initialize Sensors
+  // Initialize Sensors
   pinMode(inductiveSensorPin, INPUT);
   pinMode(irSensorPin, INPUT);
   
@@ -70,9 +65,8 @@ void setup() {
   binServo.attach(binServoPin, 500, 2500); // Attach bin rotation servo
   binServo.write(90);  // Stop rotation
   delay(500);
-//  binServo.write(0); // Start position at 0°
 
-  // 🔹 Initialize OLED Display
+  // Initialize OLED Display
   Wire.begin(SDA_PIN, SCL_PIN);
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("SSD1306 allocation failed!");
@@ -81,7 +75,7 @@ void setup() {
   display.clearDisplay();
 }
 
-// 🔹 Function to Update OLED Display
+// Function to Update OLED Display
 void updateOLED(String msg1, String msg2, String msg3) {
   display.clearDisplay();
   display.setTextSize(1);
@@ -99,7 +93,7 @@ void updateOLED(String msg1, String msg2, String msg3) {
   display.display();
 }
 
-// 🔹 Function to Rotate the Bin
+// Function to Rotate the Bin
 void rotateBin(int position) {
   Serial.print("Rotating bin to position: ");
   Serial.println(position);
@@ -121,7 +115,7 @@ void loop() {
   int irValue = digitalRead(irSensorPin);
 
   if (irValue == LOW) {  // Object detected
-    Serial.println("🔹 Object Detected!");
+    Serial.println("Object Detected!");
 
     int inductiveValue = digitalRead(inductiveSensorPin);
     bool isMetal = (inductiveValue == HIGH); // LOW means metal detected
@@ -129,8 +123,8 @@ void loop() {
     int rainRaw = analogRead(raindropSensorPin);
     int rainPercentage = map(rainRaw, 0, 4095, 100, 0);
 
-    Serial.println(isMetal ? "✅ Metal Detected!" : "❌ Non-Metal");
-    Serial.print("🌧 Moisture Percentage: ");
+    Serial.println(isMetal ? "Metal Detected!" : "Non-Metal");
+    Serial.print("Moisture Percentage: ");
     Serial.println(rainPercentage);
 
     // Reset to dry bin position
@@ -138,7 +132,7 @@ void loop() {
     delay(300); // settle
 
     if (isMetal) {
-      // Rotate to metal compartment (CCW)
+      // Rotate to metal compartment
       binServo.write(0);
       delay(175); // approx 120°
       binServo.write(90); // stop
@@ -151,7 +145,7 @@ void loop() {
       
 
     } else if (rainPercentage > 0) {
-      // Rotate to wet compartment (CW)
+      // Rotate to wet compartment 
       binServo.write(180);
       delay(175); // approx 120°
       binServo.write(90); // stop
@@ -162,7 +156,7 @@ void loop() {
       delay(175); // approx 120°
       binServo.write(90); // stop
     } else {
-      // Already at dry (default) position
+      // Already at default position
       OpenOut();
     }
 
@@ -193,3 +187,4 @@ void loop() {
 
   delay(5000); // Check every 5 seconds
 }
+
